@@ -1,27 +1,21 @@
 'use strict'
 
-import React from 'react'
-import ajax from '@fdaciuk/ajax'
+import React, { PropTypes } from 'react'
 
-const Search = () => (
+const Search = ({ isDisable, handleSearch }) => (
     <div className='search'>
         <input
             type='search'
             placeholder='Digite o nome do usuário no GitHub'
-            onKeyUp={(e) => {
-                const value = e.target.value
-                const KeyCode = e.which || e.KeyCode
-                const ENTER = 13
-
-                if (KeyCode === ENTER) {
-                    ajax().get(`https://api.github.com/users/${value}`).then((result) => {
-                        console.log(result)
-                    })
-                }
-            }}
-
+            disabled={isDisable}
+            onKeyUp={handleSearch}
         />
     </div>
 )
+
+Search.propTypes = {
+    isDisable: PropTypes.bool.isRequired,
+    handleSearch: PropTypes.func.isRequired
+}
 
 export default Search
