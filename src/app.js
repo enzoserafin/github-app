@@ -1,8 +1,9 @@
 'use strict'
 
 import React, { Component } from 'react'
-import ajax from '@fdaciuk/ajax'
 import AppContent from './components/app-content'
+import api from './services/api'
+import getGitHubApiUrl from './services/urls'
 
 class App extends Component {
   constructor() {
@@ -17,16 +18,6 @@ class App extends Component {
     this.handleSearch = this.handleSearch.bind(this)
   }
 
-  getGitHubApiUrl(username, type) {
-    const urlBase = 'http://api.github.com/users'
-    const internalUsername = username ? `/${username}` : '';
-    const internalType = type ? `/${type}` : '';
-
-    console.log(`${urlBase}${internalUsername}${internalType}`);
-
-    return `${urlBase}${internalUsername}${internalType}`;
-  }
-
   handleSearch(e) {
     const value = e.target.value
     const KeyCode = e.which || e.KeyCode
@@ -34,31 +25,33 @@ class App extends Component {
 
     if (KeyCode === ENTER) {
       this.setState({ isFetching: true })
-      ajax().get(this.getGitHubApiUrl(value)).then((result) => {
-        this.setState({
-          userInfo: {
-            username: result.name,
-            photo: result.avatar_url,
-            login: result.login,
-            repos: result.public_repos,
-            followers: result.followers,
-            following: result.following
-          },
-          repos: [],
-          starred: []
+      api.get(getGitHubApiUrl(value))
+        .then((result) => {
+          this.setState({
+            userInfo: {
+              username: result.data.name,
+              photo: result.data.avatar_url,
+              login: result.data.login,
+              repos: result.data.public_repos,
+              followers: result.data.followers,
+              following: result.data.following
+            },
+            repos: [],
+            starred: []
+          })
         })
-      })
-        .always(() => this.setState({ isFetching: false }))
+        .then(() => this.setState({ isFetching: false }))
     }
   }
 
   getRepos(type) {
 
     return (e) => {
-      ajax().get(this.getGitHubApiUrl(this.state.userInfo.login, type))
+      api.get(getGitHubApiUrl(this.state.userInfo.login, type))
         .then((result) => {
+          console.log(result)
           this.setState({
-            [type]: result.map((repo) => ({
+            [type]: result.data.map((repo) => ({
               name: repo.name,
               link: repo.html_url
             }))
