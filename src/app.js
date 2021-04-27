@@ -3,7 +3,7 @@
 import React, { Component } from 'react'
 import AppContent from './components/app-content'
 import api from './services/api'
-import getGitHubApiUrl from './services/urls'
+import getGitHubApiUrl from './utils/urls'
 
 class App extends Component {
   constructor() {
